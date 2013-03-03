@@ -75,22 +75,6 @@ Animal.prototype.findCondition = function( liv ) {
     if( rel_position.getLength() < this.sightLength && this.sightAngle < rel_angle && rel_angle < this.sightAngle + Math.PI / 2 && !liv.getState().isChild() ) return true;
     else return false;
 }
-/*
-Animal.prototype.funclojure = function() {
-    var pos = this.p;
-    var head = this.calculateHead();
-    var rel_head = head.subtract( pos );
-    var len = this.sightLength;
-    var angle = this.sightAngle;
-
-    return function( liv ) {
-	//pos.print();head.print();rel_head.print();document.write(" "+len+" "+angle);
-        var rel_position = pos.clone().subtract( liv.getPosition() );
-        var rel_angle = rel_position.getAngle() - rel_head.getAngle();
-        if( rel_position.getLength() < len && angle < rel_angle && rel_angle < angle + Math.PI / 2 && !liv.getState().isChild() ) return true;
-         else return false;
-    }
-}*/
 
 Animal.prototype.findTargets = function( liv_ary, cond ) {
     var targets = new Array();
