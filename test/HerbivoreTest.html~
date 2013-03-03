@@ -1,0 +1,55 @@
+<html>
+<head>
+
+<script type="text/javascript" src="bin/Vector.js"></script>
+<script type="text/javascript" src="bin/Position.js"></script>
+<script type="text/javascript" src="bin/Velocity.js"></script>
+
+<script type="text/javascript" src="bin/LivingThing.js"></script>
+<script type="text/javascript" src="bin/Animal.js"></script>
+<script type="text/javascript" src="bin/Herbivore.js"></script>
+
+<script type="text/javascript" >
+
+var canvas;
+var ctx;
+
+function main() {
+    //prln("no parse errer");
+
+    canvas = document.getElementById( 'test' );
+    if ( ! canvas || ! canvas.getContext ) { return false; }
+    ctx = canvas.getContext( '2d' );
+
+    var liv = new Herbivore( new Position( 30, 40 ), 100);
+
+    //prln("die test");
+    //prln("set energy 100");
+    liv.setEnergy( 100 );
+    //prln(liv.die());
+    //prln("set energy 0 ");
+    //liv.setEnergy(0);
+    //prln(liv.die());
+
+    //prln("print test");
+    //liv.print();
+    liv.draw();
+    var tem = liv.birth();
+    //tem.print();
+}
+
+function prln( str ) { document.write( str );ln(); }
+function ln() { document.write("<br>"); }
+function hoge() { document.write("hoge");ln(); }
+</script>
+</head>
+
+<body>
+<h1>Herbivore Test</h1>
+<canvas id="test" width="100" height="100"></canvas>
+<form>
+<input type="button" value="herbiovre         test           !!!!!!!!!!!!!!!!!!!!!!!" onclick="main()">
+</form>
+</body>
+
+</html>

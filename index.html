@@ -1,0 +1,65 @@
+<html>
+<head>
+<title>Ecosystem Simulator</title>
+<script type="text/javascript" src="bin/Vector.js"></script>
+<script type="text/javascript" src="bin/Position.js"></script>
+<script type="text/javascript" src="bin/Velocity.js"></script>
+
+<script type="text/javascript" src="bin/State.js"></script>
+
+<script type="text/javascript" src="bin/LivingThing.js"></script>
+<script type="text/javascript" src="bin/Animal.js"></script>
+<script type="text/javascript" src="bin/Plant.js"></script>
+<script type="text/javascript" src="bin/Herbivore.js"></script>
+<script type="text/javascript" src="bin/Carnivore.js"></script>
+
+<script type="text/javascript" src="bin/World.js"></script>
+<script type="text/javascript" src="bin/Graph.js"></script>
+
+<script type="text/javascript">
+
+var canvas;
+var ctx;
+var world;
+var graph;
+
+function init() {
+    //prln("no parse errer");
+
+    canvas = document.getElementById( "ecos" );
+    if ( ! canvas || ! canvas.getContext ) { return false; }
+    ctx = canvas.getContext( '2d' );
+
+    world = new World(50,20,5);
+    graph = new Graph();
+
+    //prln(world.getPlantPopulation());
+    //prln(world.getHerbivorePopulation());
+    //prln(world.getCarnivorePopulation());
+    setInterval( "main()", 40 );
+}
+
+function main() {
+    world.evolve();
+    world.draw();
+    graph.addLatestData( world.getPlantPopulation(), world.getHerbivorePopulation(), world.getCarnivorePopulation() );
+    graph.draw();
+
+}
+
+function prln( str ) { document.write( str );ln(); }
+function ln() { document.write("<br>"); }
+function hoge() { document.write("hoge");ln(); }
+
+</script>
+  </head>
+  <body onload="init()">
+<h1>Ecosystem Simulatoer</h1>
+<canvas id="ecos" width="400" height="500"></canvas>
+    <p>Green circles: plants, do not move and grow at random place.</p>
+    <p>Blue drops: herbivores, move randomly and eat plants.</p>
+    <p>Red arrows: carnivores, move faster than Herbivores and eat them.</p>
+    <p>Inspired by<br>
+<a target="_blank" href="http://www.nicovideo.jp/watch/sm6133947">ÅyÉjÉRÉjÉRìÆâÊÅzâ…Ç»ÇÃÇ≈êlçHê∂ñΩÇënÇ¡ÇƒÇ›ÇΩ</a></p>
+  </body>
+</html>

@@ -1,0 +1,59 @@
+<html>
+  <head>
+
+<script type="text/javascript" src="bin/Vector.js"></script>
+<script type="text/javascript" src="bin/Position.js"></script>
+<script type="text/javascript" src="bin/Velocity.js"></script>
+
+<script type="text/javascript" src="bin/LivingThing.js"></script>
+<script type="text/javascript" src="bin/Animal.js"></script>
+<script type="text/javascript" src="bin/Plant.js"></script>
+<script type="text/javascript" src="bin/Herbivore.js"></script>
+<script type="text/javascript" src="bin/Carnivore.js"></script>
+
+<script type="text/javascript" src="bin/World.js"></script>
+
+<script type="text/javascript">
+
+var canvas;
+var ctx;
+var world
+
+function init() {
+    //prln("no parse errer");
+
+    canvas = document.getElementById( 'test' );
+    if ( ! canvas || ! canvas.getContext ) { hoge();return false; }
+    ctx = canvas.getContext( '2d' );
+
+    world = new World(10,5,3);
+
+    //prln(world.getPlantPopulation());
+    //prln(world.getHerbivorePopulation());
+    //prln(world.getCarnivorePopulation());
+setInterval( "main()", 40 );
+}
+
+function main() {
+
+    world.moveAll();
+    world.eatAll();
+    world.birthAll();
+    world.dieAll();
+    world.draw();
+}
+
+function prln( str ) { document.write( str );ln(); }
+function ln() { document.write("<br>"); }
+function hoge() { document.write("hoge");ln(); }
+
+</script>
+  </head>
+  <body onload="init()">
+<h1>World Test</h1>
+<canvas id="test" width="400" height="500"></canvas>
+<form>
+<input type="button" value="herbiovre         test           !!!!!!!!!!!!!!!!!!!!!!!" onclick="main()">
+</form>
+  </body>
+</html>

@@ -1,0 +1,181 @@
+<html>
+<head>
+<script type="text/javascript" >
+
+var Vector = function( x, y ) {
+    this.x = x;
+    this.y = y;
+}
+
+Vector.prototype = {
+
+    add : function( v ) {
+        this.x += v.getX();
+        this.y += v.getY();
+    },
+
+    subtract : function( v ) {
+        this.x -= v.getX();
+        this.y -= v.getY();
+    },
+
+    extend : function( c ) {
+        this.x *= c;
+        this.y *= c;
+    },
+
+    normalize : function() {
+        var c = this.getLength();
+        this.x /= c;
+        this.y /= c;
+    },
+
+    rotate : function( angle ) {
+        var rad = this.convertRadian( angle );
+        var temx = this.x;
+        var temy = this.y;
+        this.x = Math.cos( rad ) * temx - Math.sin( rad ) * temy;
+        this.y = Math.sin( rad ) * temx + Math.cos( rad ) * temy;
+    },
+
+    convertRadian : function ( angle ) {
+        return ( angle / 360 ) * 2 * Math.PI;
+    },
+
+    relativeMorphism : function( f, v ) {
+        this.subtract( v );
+        f();
+        this.add( v );
+    },
+
+    rotateAround : function ( v, angle ) {
+        this.subtract( v );
+        this.rotate( angle );
+        this.add( v );
+    },
+
+    extendDistance : function( v, c ) {
+        this.subtract( v );
+        this.extend( c );
+        this.add( v );
+    },
+
+    distanceBetween : function( v ) {
+        return Math.sqrt( ( v.getX() - this.x ) * ( v.getX() - this.x ) + ( v.getY() - this.y ) * ( v.getY() - this.y ) );
+    },
+
+    toString : function() {
+        return "("+this.x+","+this.y+")";
+    },
+
+    print : function() {
+        document.write( this.toString() );
+    },
+
+    toRoundString : function() {
+         return "("+Math.round(this.x)+","+Math.round(this.y)+")";
+    },
+
+    roundPrint : function() {
+        document.write( this.toRoundString() );
+    },
+
+    setVector : function( x, y ) { this.x = x; this.y = y; },
+    setX : function( x ) { this.x = x; },
+    setY : function( y ) { this.y = y; },
+    getX : function() { return this.x; },
+    getY : function() { return this.y; },
+    getLength : function() { return Math.sqrt( this.x * this.x + this.y * this.y ); },
+    getAngle : function() { return Math.asin( this.x / this.getLength() ); }
+}
+
+var Position = function ( x, y ) {
+    this.x = x;
+    this.y = y;
+}
+Position.prototype = new Vector();
+
+
+
+
+
+
+
+
+
+var binarySearchTest = function( p ) {
+    this.p = p;
+    this.size = 2;
+}
+binarySearchTest.prototype.doTest = function(ary) {
+    document.write("looking for ");
+    this.p.print();
+    ln();
+    var i = this.binarySearch( ary, 0, ary.length - 1);
+    document.write(i);
+}
+binarySearchTest.prototype.binarySearch = function( pos_ary, lower, upper ) {
+var cor = new Position(lower,upper);
+cor.print();
+
+    var index = Math.floor( ( upper + lower ) / 2 );
+document.write("checked index");
+document.write(index);
+ln();
+    var dis = pos_ary[index].distanceBetween( this.p );
+
+    if ( dis < this.size )
+        return index;
+    if ( upper == lower )
+        return null;
+    else if ( pos_ary[index].getX() < this.p.getX() )
+        lower = index + 1;
+    else
+        upper = index;
+    return this.binarySearch( pos_ary, lower, upper );
+}
+
+
+
+function main() {
+var ary = new Array(7);
+
+ary[0] = new Position(1,2);
+ary[1] = new Position(3,2);
+ary[2] = new Position(6,9);
+ary[3] = new Position(1,7);
+ary[4] = new Position(2,5);
+
+ary[5] = new Position(2,2);
+ary[6] = new Position(9,5);
+
+printAll(ary);
+ln();
+ary.sort( function(a,b) { 
+    if (a.getX() < b.getX()) return -1;
+    else if (a.getX() > b.getX()) return 1;
+    return 0; } );
+printAll(ary);ln();
+
+var tes = new binarySearchTest(new Position(2,5));
+tes.doTest(ary);
+}
+function ln() { document.write("<br>"); }
+function printAll(ary) {
+    for(var i = 0; i < ary.length; i++) {
+        ary[i].print();
+    }
+}
+
+function hoge() { document.write("hoge"); }
+</script>
+</head>
+
+<body>
+<h1>BinarySearch Test</h1>
+<form>
+<input type="button" value="search         test           !!!!!!!!!!!!!!!!!!!!!!!" onclick="main()">
+</form>
+</body>
+
+</html>

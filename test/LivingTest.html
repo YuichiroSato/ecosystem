@@ -1,0 +1,39 @@
+<html>
+<head>
+
+<script type="text/javascript" src="bin/Vector.js"></script>
+<script type="text/javascript" src="bin/Position.js"></script>
+
+<script type="text/javascript" src="bin/LivingThing.js"></script>
+
+<script type="text/javascript" >
+function main() {
+    prln("no parse errer");
+    var liv = new LivingThing( new Position( 3, 4 ) );
+
+    prln("die test");
+    prln("set energy 100");
+    liv.setEnergy( 100 );
+    prln(liv.die());
+    prln("set energy 0 ");
+    liv.setEnergy(0);
+    prln(liv.die());
+
+    prln("print test");
+    liv.print();
+}
+
+function prln( str ) { document.write( str );ln(); }
+function ln() { document.write("<br>"); }
+function hoge() { document.write("hoge");ln(); }
+</script>
+</head>
+
+<body>
+<h1>LivingThing Test</h1>
+<form>
+<input type="button" value="living_thing         test           !!!!!!!!!!!!!!!!!!!!!!!" onclick="main()">
+</form>
+</body>
+
+</html>

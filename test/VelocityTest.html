@@ -1,0 +1,67 @@
+<html>
+<head>
+<script type="text/javascript" src="bin/Vector.js"></script>
+<script type="text/javascript" src="bin/Velocity.js"></script>
+<script type="text/javascript" >
+function main() {document.write("hoge");
+  var v = new Velocity( 4, 4 );
+  v.print();ln();
+  var q = new Velocity(1,1);
+  q.print();ln();
+
+  v.add( q );
+  v.print();ln();
+  q.subtract( v );
+  q.print();ln();
+
+  q.setX(0);q.setY(0);
+  q.print();ln();
+  v.rotate( 45 );
+  v.print();ln();
+  v.setX(5);v.setY(5);
+  v.print();ln();
+
+  document.write("relative<br>");
+  v.print();q.print();ln();
+  q.extendDistance( v, 3 );
+  q.print();ln();
+
+  document.write("radianTest<br>");
+  document.write(q.convertRadian( 180 ));ln();
+  document.write(q.convertRadian( 90 ) / Math.PI );ln();
+  document.write(q.convertRadian( -135 ) / Math.PI );ln();
+
+  document.write("rotateTest<br>");
+  v.setX(5);v.setY(5);
+  v.print();ln();
+  v.rotate(45);
+  v.print();ln();
+  v.rotate(-45);
+  v.print();ln();
+
+  q.rotateAround( v, 45);
+  q.print();ln();
+  q.rotateAround( v, -45);
+  q.print();ln();
+
+  document.write("length<br>");
+  q.setVector( 2, 0);
+  document.write(q.getLength());ln();
+  q.setVector(1,1);
+  document.write(q.getLength());ln();
+  q.setVector(-1,1.73);
+  document.write(q.getLength());
+}
+
+function ln() { document.write("<br>"); }
+</script>
+</head>
+
+<body>
+<h1>Velocity Test</h1>
+<form>
+<input type="button" value="velocity         test           !!!!!!!!!!!!!!!!!!!!!!!" onclick="main()">
+</form>
+</body>
+
+</html>

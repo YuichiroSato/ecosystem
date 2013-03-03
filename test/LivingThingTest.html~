@@ -1,0 +1,19 @@
+<html>
+<head>
+<script type="text/javascript" src="bin/LivingThing.js"></script>
+<script type="text/javascript" src="bin/Animal.js"></script>
+<script type="text/javascript" >
+function main() {document.write("hoge");
+
+function ln() { document.write("<br>"); }
+</script>
+</head>
+
+<body>
+<h1>Animal Test</h1>
+<form>
+<input type="button" value="animal         test           !!!!!!!!!!!!!!!!!!!!!!!" onclick="main()">
+</form>
+</body>
+
+</html>
