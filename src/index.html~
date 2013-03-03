@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="ja" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <title>Ecosystem Simulator</title>
+    <!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+<script type="text/javascript">
+
+function test() { document.write("hoge"); }
+function ln() { document.write("<br>"); }
+
+//canvas
+var canvas;
+//context
+var ctx;
+//world of ecosystem
+var world;
+//graph of population
+var graph;
+
+/*
+ ########################################################################
+ 
+                         Vector type Data Object
+ 
+ ########################################################################
+*/
+
+/*
+
+  Vector <|---- Position
+            |
+            --- Velocity
+*/
+
+var Vector = function( x, y ) {
+    this.x = x;
+    this.y = y;
+}
+
+Vector.prototype = {
+
+    add : function( v ) {
+        this.x += v.getX();
+        this.y += v.getY();
+    },
+
+    subtract : function( v ) {
+        this.x -= v.getX();
+        this.y -= v.getY();
+    },
+
+    extend : function( c ) {
+        this.x *= c;
+        this.y *= c;
+    },
+
+    normalize : function() {
+        var c = this.getLength();
+        this.x /= c;
+        this.y /= c;
+    },
+
+    rotate : function( angle ) {
+        var rad = this.convertRadian( angle );
+        var temx = this.x;
+        var temy = this.y;
+        this.x = Math.cos( rad ) * temx - Math.sin( rad ) * temy;
+        this.y = Math.sin( rad ) * temx + Math.cos( rad ) * temy;
+    },
+
+    convertRadian : function ( angle ) {
+        return ( angle / 360 ) * 2 * Math.PI;
+    },
+
+    relativeMorphism : function( f, v ) {
+        this.subtract( v );
+        f();
+        this.add( v );
+    },
+
+    rotateAround : function ( v, angle ) {
+        this.subtract( v );
+        this.rotate( angle );
+        this.add( v );
+    },
+
+    extendDistance : function( v, c ) {
+        this.subtract( v );
+        this.extend( c );
+        this.add( v );
+    },
+
+    distanceBetween : function( v ) {
+        return Math.sqrt( ( v.getX() - this.x ) * ( v.getX() - this.x ) + ( v.getY() - this.y ) * ( v.getY() - this.y ) );
+    },
+
+    toString : function() {
+        return "("+this.x+","+this.y+")";
+    },
+
+    print : function() {
+        document.write( this.toString() );
+    },
+
+    toRoundString : function() {
+         return "("+Math.round(this.x)+","+Math.round(this.y)+")";
+    },
+
+    roundPrint : function() {
+        document.write( this.toRoundString() );
+    },
+
+    setVector : function( x, y ) { this.x = x; this.y = y; },
+    setX : function( x ) { this.x = x; },
+    setY : function( y ) { this.y = y; },
+    getX : function() { return this.x; },
+    getY : function() { return this.y; },
+    getLength : function() { return Math.sqrt( this.x * this.x + this.y * this.y ); },
+    getAngle : function() { return Math.asin( this.x / this.getLength() ); }
+}
+
+var Position = function ( x, y ) {
+    this.x = x;
+    this.y = y;
+}
+Position.prototype = new Vector();
+
+var Velocity = function ( x, y ) {
+    this.x = x;
+    this.y = y;
+}
+Velocity.prototype = new Vector();
+Velocity.prototype.randomRotate = function() {
+    this.rotate( Math.random() * 360 );
+}
+
+
+//###################################################################
+
+
+
+/*
+  ####################################################################
+
+                           Living     Things
+
+  ####################################################################
+*/
+
+/*
+
+    LivingThing<|------- Animal<|--------- Herbivore
+                  |               |
+                  |               ------- Carnivore
+                  |
+                  ------ Plant
+
+*/
+
+// ######################## Super class ###############################
+var LivingThing = function( p ) {
+    this.p = p;
+    this.energy;
+    this.size;
+
+    this.graphics;
+    this.birth_if;
+}
+
+LivingThing.prototype = {
+
+    draw : function() {
+        this.graphics();
+    },
+
+    birth : function() {
+        return this.birth_if();
+    },
+
+    die : function() {
+        if ( this.energy <= 0 )
+            return true;
+    },
+
+    setPosition : function( p ) { this.p = p; },
+    setEnergy : function( e ) { this.energy = e; },
+    setSize : function( s ) { this.size = s; },
+
+    getPosition : function() { return this.p; },
+    getEnergy : function() { return this.energy; },
+    getSize : function() { return this.size; },
+}
+
+var Animal = function( p, v, energy ) {
+    this.p = p;
+    this.v = v;
+    this.energy = energy;
+    this.size = 5;
+
+    this.graphics;
+    this.move_option;
+    this.eat_option;
+    this.birth_if;
+}
+
+Animal.prototype = new LivingThing();
+Animal.prototype.draw = function() {
+    this.graphics( this.calculateHead() );
+}
+Animal.prototype.calculateHead = function() {
+    var temp = clone( this.p );
+    var temv = clone( this.v );
+    temv.normalize();
+    temv.extend( this.size );
+    temp.add( temv );
+    return temp;
+}
+Animal.prototype.move = function() {
+        this.p.add( this.v );
+
+        if( this.p.getX() < 0 )
+           this.p.setX( canvas.width );
+        else if( canvas.width < this.p.getX() )
+           this.p.setX( 0 );
+        if( this.p.getY() < 0)
+            this.p.setY( canvas.width );  // to fix ecosystem field as square
+        else if( canvas.width < this.p.getY() )
+            this.p.setY( 0 );
+
+        this.move_option();
+}
+Animal.prototype.eat = function( liv_ary ) {
+    var index = this.binarySearch( liv_ary, 0, liv_ary.length - 1 );
+    if ( index ) {
+        liv_ary.splice( index, 1 );
+        this.eat_option();
+    }
+    return liv_ary;
+}
+Animal.prototype.binarySearch = function( liv_ary, lower, upper ) {
+    var index = Math.floor( ( upper + lower ) / 2 );
+    var dis = liv_ary[index].getPosition().distanceBetween( this.p );
+
+    if ( dis < this.size )
+        return index;
+    if ( upper == lower )
+        return null;
+    else if ( liv_ary[index].getPosition().getX() < this.p.getX() )
+        lower = index + 1;
+    else
+        upper = index;
+    return this.binarySearch( liv_ary, lower, upper );
+}
+Animal.prototype.birth = function() {
+    return this.birth_if();
+}
+Animal.prototype.setVelocity = function( v ) { this.v = v; }
+Animal.prototype.getVelocity = function() { return this.v; }
+
+
+//################################################################
+
+//##################### Sub class ###############################
+
+var Plant = function( p ) {
+    this.p = p;
+    this.size = 5;
+    this.energy = 100;
+}
+Plant.prototype = new LivingThing();
+Plant.prototype.graphics = function() {
+    ctx.beginPath();
+    ctx.fillStyle = "rgb(0,200,0)";
+    ctx.strokeStyle = "rgb(0,200,0)";
+    ctx.arc( this.p.getX(), this.p.getY(), this.size, 0, Math.PI*2, false);
+    ctx.fill();
+}
+Plant.prototype.birth_if = function() {
+    if ( Math.random() < 0.1 ) {
+        var radx = 20 + Math.random() * 360;
+        var rady = 20 + Math.random() * 360;
+        return new Plant( new Position( radx, rady ) );
+    }
+}
+
+
+
+
+var Herbivore = function( p, f ) {
+    this.p = p;
+    this.v = new Velocity( 5, 0 );
+    this.v.randomRotate();
+    this.size = 8;
+    this.energy = f;
+}
+Herbivore.prototype = new Animal();
+Herbivore.prototype.graphics = function( head ) {
+    ctx.beginPath();
+    ctx.fillStyle = "rgb(0,0,200)";
+    ctx.strokeStyle = "rgb(0,0,200)";
+    ctx.moveTo( head.getX(), head.getY() );
+    head.rotateAround( this.p, 135 );
+    ctx.lineTo( head.getX(), head.getY() );
+    head.rotateAround( this.p, 45 );
+    ctx.lineTo( head.getX(), head.getY() );
+    head.rotateAround( this.p, 45 );
+    ctx.lineTo( head.getX(), head.getY() );
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+}
+Herbivore.prototype.move_option = function() {
+    this.energy -= 0.1;
+    if ( Math.random() < 0.1 ) {
+        this.v.randomRotate();
+    }
+}
+Herbivore.prototype.eat_option = function() {
+    this.energy += 20;
+}
+Herbivore.prototype.birth_if = function() {
+    if ( 70 <= this.energy ) {
+        this.energy -= 30;
+        return new Herbivore( clone( this.p ), 50 );
+    }
+}
+
+
+
+var Carnivore = function( p, f ) {
+    this.p = p;
+    this.v = new Velocity( 8, 0 );
+    this.v.randomRotate();
+    this.size = 10;
+    this.energy = f;
+}
+Carnivore.prototype = new Animal();
+Carnivore.prototype.graphics = function( head ) {
+    ctx.beginPath();
+    ctx.fillStyle = "rgb(200,0,0)";
+    ctx.strokeStyle = "rgb(200,0,0)";
+    var back = clone( head );
+    back.rotateAround( this.p, 180 );
+    back.extendDistance( this.p, 0.3 );
+    ctx.moveTo( head.getX(), head.getY() );
+    head.rotateAround( this.p, 140 );
+    ctx.lineTo( head.getX(), head.getY() );
+    ctx.lineTo( back.getX(), back.getY() );
+    head.rotateAround( this.p, 80 );
+    ctx.lineTo( head.getX(), head.getY() );
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+}
+Carnivore.prototype.move_option = function() {
+    this.energy -= 3.0;
+    if ( Math.random() < 0.1 ) {
+        this.v.randomRotate();
+    }
+}
+Carnivore.prototype.eat_option = function() {
+    this.energy += 100;
+}
+Carnivore.prototype.birth_if = function() {
+    if ( 500 <= this.energy ) {
+        this.energy -= 450;
+        return new Carnivore( clone( this.p ), 300 );
+    }
+}
+
+
+//#############################################################
+
+
+function Graph() {
+
+    var margin = 10;
+    var graph_width = canvas.width - 2 * margin;
+    var graph_height = canvas.height - canvas.width - margin;
+
+    var pn = new Array(graph_width);
+    var hn = new Array(graph_width);
+    var cn = new Array(graph_width);
+    var unit = 1;
+    var upswitch = 90;
+    var downswitch = 50;
+
+    var begin_taxis = new Position( margin, canvas.height - margin );
+    var end_taxis = new Position( margin + graph_width, canvas.height - margin );
+    var begin_naxis = new Position( margin, canvas.height - margin );
+    var end_naxis = new Position( margin, canvas.height - margin - graph_height );
+
+    this.addLatestData = function( new_pn, new_hn, new_cn ) {
+        pn.splice( 0, 1 );
+        hn.splice( 0, 1 );
+        cn.splice( 0, 1 );
+        pn[pn.length] = new_pn;
+        hn[hn.length] = new_hn;
+        cn[cn.length] = new_cn;
+        unit = this.unitSwitch( new_pn, new_hn, new_cn, unit );
+    }
+
+    this.unitSwitch = function( new_pn, new_hn, new_cn ) {
+        if ( upswitch < new_pn || upswitch < new_hn || upswitch < new_cn )
+            return 2;
+        else if ( new_pn < downswitch && new_hn < downswitch && new_cn < downswitch )
+            return 1;
+        return unit;
+    }
+
+    this.draw = function() {
+        this.drawAxis();
+        this.plotData( pn, "rgb(0,200,0)" );
+        this.plotData( hn, "rgb(0,0,200)" );
+        this.plotData( cn, "rgb(200,0,0)" );
+    }
+
+    this.plotData = function( data, color ) {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.moveTo( begin_taxis.getX(), begin_taxis.getY() - data[0] / unit );
+        for (var i = 1; i < data.length; i++) {
+            ctx.lineTo( begin_taxis.getX() + i, begin_taxis.getY() - data[i] / unit );
+        }
+        ctx.stroke();
+    }
+
+    this.drawAxis = function() {
+        ctx.beginPath();
+        ctx.strokeStyle = "rgb(124,124,124)";
+        this.drawLine( begin_taxis, end_taxis );
+        this.drawLine( begin_naxis, end_naxis );
+        ctx.stroke();
+    }
+
+    this.drawLine = function( from, to ) {
+        ctx.moveTo( from.getX(), from.getY() );
+        ctx.lineTo( to.getX(), to.getY() );
+    }
+}
+
+//######################################################################
+
+function start() {
+    canvas = document.getElementById( 'main' );
+    if ( ! canvas || ! canvas.getContext ) { return false; }
+    ctx = canvas.getContext( '2d' );
+    ctx.fillStyle = "rgb(0,0,0)";
+
+    world = new World(50,10,5);
+    graph = new Graph();
+    setInterval( "draw()", 40 );
+}
+
+function draw() {
+    world.evolve();
+    world.draw();
+    graph.addLatestData( world.getPlantPopulation(), world.getHerbivorePopulation(), world.getCarnivorePopulation() );
+    graph.draw();
+}
+
+/*
+ ######################################################################
+
+                         Ecosystem Symulator
+
+ ######################################################################
+*/
+
+
+function World( num_plant, num_herbivore, num_carnivore ) {
+
+    var p = initArray( num_plant, function() { return new Plant( randomPosition() ); } );
+    var h = initArray( num_herbivore, function() { return new Herbivore( randomPosition(), 50 ); } );
+    var c = initArray( num_carnivore, function() { return new Carnivore( randomPosition(), 300 ); } );
+
+    this.evolve = function() {
+        this.moveAll();
+        this.eatAll();
+        this.birthAll();
+        this.dieAll();
+    }
+
+    this.moveAll = function() {
+        for (var i = 0; i < h.length; i++) {
+            h[i].move();
+        }
+        for (var i = 0; i < c.length; i++) {
+            c[i].move();
+        }
+    }
+
+    this.eatAll = function() {
+        var alg = function( liv1, liv2 ){
+    	    if( liv1.getPosition().getX() < liv2.getPosition().getX() ) return -1;
+            if( liv1.getPosition().getX() > liv2.getPosition().getX() ) return 1;
+            return 0;
+        };
+        p.sort( alg );
+        h.sort( alg );
+        for (var i = 0; i < h.length; i++) {
+            p = h[i].eat( p );
+        }
+        for (var i = 0; i < c.length; i++) {
+            h = c[i].eat( h );
+        }
+    }
+
+    this.birthAll = function() {
+        //for (var i = 0; i < p.length; i++) {
+        //    var tem = p[i].birth();
+        //    if (tem) p[p.length] = tem;
+        //}
+        if ( Math.random() < 0.8 ) 
+            p[p.length] = new Plant( randomPosition() );
+        for (var i = 0; i < h.length; i++) {
+            var tem = h[i].birth();
+            if (tem) h[h.length] = tem;
+        }
+        for (var i = 0; i < c.length; i++) {
+            var tem = c[i].birth();
+            if (tem) c[c.length] = tem;
+        }
+    }
+
+    this.dieAll = function() {
+        for (var i = h.length - 1; -1 < i; i--) {
+            if( h[i].die() ) h.splice( i, 1 );
+        }
+        for (var i = c.length - 1; -1 < i; i--) {
+            if( c[i].die() ) c.splice( i, 1 );
+        }
+    }
+
+    this.draw = function() {
+        ctx.fillStyle = "rgb(255,255,255)";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        for (var i = 0; i < p.length; i++) {
+            p[i].draw();
+        }
+        for (var i = 0; i < h.length; i++) {
+            h[i].draw();
+        }
+        for (var i = 0; i < c.length; i++) {
+            c[i].draw();
+        }
+    }
+
+    this.getPlantPopulation = function() { return p.length; }
+    this.getHerbivorePopulation = function() { return h.length; }
+    this.getCarnivorePopulation = function() { return c.length; }
+}
+
+function rad( lower, upper ) {
+    return lower + Math.random() * upper;
+}
+
+function randomPosition() {
+    return new Position( rad( 20, canvas.width - 20 ), rad( 20, canvas.width - 20 ) );
+}
+
+function initArray( size, constractor ) {
+    var ary = new Array( size );
+    for (var i = 0; i < size; i++) {
+        ary[i] = constractor();
+    }
+    return ary;
+}
+
+function clone( obj ) {
+    var f = function(){};
+    f.prototype = obj;
+    return new f;
+}
+
+</script>
+  </head>
+  <body onload="start()">
+    <h1>Ecosystem Simulator</h1>
+    <p><canvas id="main" width="400" height="500"></canvas></p>
+    <p>Green circles: plants, do not move and grow at random place.</p>
+    <p>Blue drops: herbivores, move randomly and eat plants.</p>
+    <p>Red arrows: carnivores, move faster than Herbivores and eat them.</p>
+    <p>Inspired by<br><script type="text/javascript" src="http://ext.nicovideo.jp/thumb_watch/sm6133947"></script><noscript><a href="http://www.nicovideo.jp/watch/sm6133947">ÅyÉjÉRÉjÉRìÆâÊÅzâ…Ç»ÇÃÇ≈êlçHê∂ñΩÇënÇ¡ÇƒÇ›ÇΩ</a></noscript></p>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+/*
+
+    LivingThing<|------- Animal<|--------- Herbivore
+                  |               |
+                  |               ------- Carnivore
+                  |
+                  ------ Plant
+
+*/
+
+var Plant = function( p ) {
+    this.p = p;
+    this.size = 5;
+    this.energy = 100;
+}
+
+Plant.prototype = new LivingThing();
+
+Plant.prototype.graphics = function() {
+    ctx.beginPath();
+    ctx.fillStyle = "rgb(0,200,0)";
+    ctx.strokeStyle = "rgb(0,200,0)";
+    ctx.arc( this.p.getX(), this.p.getY(), this.size, 0, Math.PI*2, false);
+    ctx.fill();
+}
+
+Plant.prototype.birth_if = function() {
+    if ( Math.random() < 0.1 ) {
+        var radx = 20 + Math.random() * 360;
+        var rady = 20 + Math.random() * 360;
+        return new Plant( new Position( radx, rady ) );
+    }
+}
+
+Plant.prototype.instanceOf = function() { return "Plant"; }

@@ -1,0 +1,180 @@
+/*
+
+    LivingThing<|------- Animal<|--------- Herbivore
+                  |               |
+                  |               ------- Carnivore
+                  |
+                  ------ Plant
+
+*/
+
+var Carnivore = function( p, en ) {
+    this.p = p;
+    this.v = new Velocity( 8, 0 );
+    this.v.randomRotate();
+    this.size = 10;
+    this.energy = en;
+    this.sightLength = 100;
+    this.sightAngle = Math.PI / 4;
+    this.state = new State();
+
+    this.fill_color = "rgb(200,0,0)";
+    this.stroke_color = "rgb(200,0,0)";
+    this.color_changed = false;
+
+    this.dt = 0.04
+    this.end_of_child = 2;
+    this.end_of_puberty = 10;
+    this.end_of_adult = 300;
+}
+
+Carnivore.prototype = new Animal();
+
+Carnivore.prototype.graphics = function( head ) {
+
+    if ( !this.state.isAdult() && this.energy < 50 ) {
+        this.fill_color = "rgb(200,100,100)";
+    }
+    else if ( !this.state.isAdult() && 50 <= this.energy ) {
+        this.fill_color = "rgb(200,0,0)";
+    }
+    else if ( this.energy < 100 && !this.color_changed ) {
+        this.fill_color = "rgb(255,200,200)";
+        this.stroke_color = "rgb(255,0,0)";
+        this.color_changed = true;
+    }
+    else if ( 200 < this.energy ) {
+        this.fill_color = "rgb(200,0,0)";
+        this.stroke_color = "rgb(200,0,0)";
+        this.color_changed = false;
+    }
+    if ( this.state.isOld() ) {
+        this.fill_color = "rgb(255,200,200)";
+        this.stroke_color = "rgb(255,0,0)";
+    }
+
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.fillStyle = this.fill_color;
+    ctx.strokeStyle = this.stroke_color;
+
+    var back = head.clone();
+
+    back.rotateAround( this.p, 180 );
+    back.extendDistance( this.p, 0.3 );
+    ctx.moveTo( head.getX(), head.getY() );
+    head.rotateAround( this.p, 140 );
+    ctx.lineTo( head.getX(), head.getY() );
+    ctx.lineTo( back.getX(), back.getY() );
+    head.rotateAround( this.p, 80 );
+    ctx.lineTo( head.getX(), head.getY() );
+
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+    ctx.lineWidth = 1;
+}
+
+Carnivore.prototype.move_option = function() {
+    if( this.state.isChild() )
+        this.energy -= 0.2;
+    else if ( this.state.isAdult() )
+        this.energy -= 1.5;
+    else
+        this.energy -= 1.0;
+
+    if ( !this.state.isAdult() && Math.random() < 0.1 ) {
+        this.v.randomRotate();
+    }
+    else if ( Math.random() < 0.01 )
+        this.v.randomRotate();
+
+    if ( this.state.isAdult() && Math.random() < 0.5 ) {
+        var herb = world.getHerbivore();
+        this.changeVelocityToClosest( herb );
+    }
+}
+
+Carnivore.prototype.changeVelocityToClosest = function( herb ) {
+
+    var targets = this.findTargets( herb, this.funclojure() );
+
+    if ( 0 < targets.length ) {
+        var closer = function( liv1, liv2 ) {
+            if( liv1.getPosition().distanceBetween( this.p ) < liv2.getPosition().distanceBetween( this.p ) )
+                return liv1;
+            else return liv2; 
+        }
+
+        var closest_liv = targets[0];
+        for(var i = 0; i < targets.length; i++)
+            closest_liv = closer.call( this, closest_liv, targets[i] );
+
+        var result = closest_liv.getPosition().clone().subtract( this.p ).setLength( this.size );
+            this.v = new Velocity( result.getX(), result.getY() );
+    }
+    else if ( Math.random() < 0.1 )
+        this.v.randomRotate();
+}
+
+Carnivore.prototype.funclojure = function() {
+    var pos = this.p;
+    var head = this.calculateHead();
+    var rel_head = head.subtract( pos );
+    var len = this.sightLength;
+    var angle = this.sightAngle;
+
+    return function( liv ) {
+	//pos.print();head.print();rel_head.print();document.write(" "+len+" "+angle);
+        var rel_position = pos.clone().subtract( liv.getPosition() );
+        var rel_angle = rel_position.getAngle() - rel_head.getAngle();
+        if( rel_position.getLength() < len && angle < rel_angle && rel_angle < angle + Math.PI / 2 && !liv.getState().isChild() ) return true;
+         else return false;
+    }
+}
+
+Carnivore.prototype.eat_option = function() {
+    this.energy += 100;
+}
+
+Carnivore.prototype.grow_if = function() {
+    if( this.age < this.end_of_child ) {
+        this.state.setState("child");
+        this.size = 5;
+        this.v.normalize().extend( 3 );
+    }
+    else if ( this.state.isChild() && 100 < this.energy && this.end_of_child < this.age ) {
+        this.state.grow();
+        this.size = 5;
+        this.v.normalize().extend( 4 );
+        this.energy -= 50;
+    }
+    else if ( this.state.isPuberty() && 600 < this.energy && this.end_of_puberty < this.age ) {
+        this.state.grow();
+        this.size = 10;
+        this.v.normalize().extend( 13 );
+        this.energy -= 400;
+        this.age = this.end_of_adult - Math.random() * 20;
+    }
+    else if ( !this.state.isOld() && this.end_of_adult < this.age ) {
+        this.state.setState( "old" );
+        this.v.normalize().extend( 1 );
+    }
+
+    this.age += this.dt;
+}
+
+Carnivore.prototype.birth_if = function() {
+    if ( this.state.isAdult() && 500 <= this.energy ) {
+        this.energy -= 250;
+        return new Carnivore( this.p.clone(), 100 );
+    }
+}
+
+Carnivore.prototype.die = function() {
+    if ( this.energy <= 0 )
+        return true;
+    if ( this.state.isOld() && Math.random() < 0.01 )
+        return true;
+    return false;
+}

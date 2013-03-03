@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="ja" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <title>Ecosystem Simulator</title>
+    <!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+
+<script type="text/javascript" src="./Vetor.js"></script>
+<script type="text/javascript" src="./Position.js"></script>
+<script type="text/javascript" src="./Velocity.js"></script>
+
+<script type="text/javascript" src="./LivingThing.js"></script>
+<script type="text/javascript" src="./Animal.js"></script>
+<script type="text/javascript" src="./Plant.js"></script>
+<script type="text/javascript" src="./Herbivore.js"></script>
+<script type="text/javascript" src="./Carnivore.js"></script>
+
+<script type="text/javascript" src="./Graph.js"></script>
+<script type="text/javascript" src="./World.js"></script>
+
+<script type="text/javascript">
+
+function test() { document.write("hoge"); }
+function ln() { document.write("<br>"); }
+
+//canvas
+var canvas;
+//context
+var ctx;
+//world of ecosystem
+var world;
+//graph of population
+var graph;
+
+function start() {
+    canvas = document.getElementById( 'main' );
+    if ( ! canvas || ! canvas.getContext ) { return false; }
+    ctx = canvas.getContext( '2d' );
+    ctx.fillStyle = "rgb(0,0,0)";
+document.write(canvas.width);
+    world = new World(50,10,5);
+    //graph = new Graph();
+    setInterval( "draw()", 40 );
+}
+
+function draw() {
+    world.evolve();
+    world.draw();test();
+    //graph.addLatestData( world.getPlantPopulation(), world.getHerbivorePopulation(), world.getCarnivorePopulation() );
+    //graph.draw();
+}
+
+</script>
+  </head>
+  <body onload="start()">
+    <h1>Ecosystem Simulator</h1>
+    <p><canvas id="main" width="400" height="500"></canvas></p>
+    <p>Green circles: plants, do not move and grow at random place.</p>
+    <p>Blue drops: herbivores, move randomly and eat plants.</p>
+    <p>Red arrows: carnivores, move faster than Herbivores and eat them.</p>
+    <p>Inspired by<br><script type="text/javascript" src="http://ext.nicovideo.jp/thumb_watch/sm6133947"></script><noscript><a href="http://www.nicovideo.jp/watch/sm6133947">ÅyÉjÉRÉjÉRìÆâÊÅzâ…Ç»ÇÃÇ≈êlçHê∂ñΩÇënÇ¡ÇƒÇ›ÇΩ</a></noscript></p>
+  </body>
+</html>
