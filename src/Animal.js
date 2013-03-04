@@ -40,13 +40,13 @@ Animal.prototype.move = function() {
         this.p.add( this.v );
 
         if( this.p.getX() < 0 )
-           this.p.setX( canvas.width );
+           this.p.setX( canvas.width - 10 );
         else if( canvas.width < this.p.getX() )
            this.p.setX( 0 );
         if( this.p.getY() < 0)
             this.p.setY( canvas.width );  // to fix ecosystem field as square
         else if( canvas.width < this.p.getY() )
-            this.p.setY( 0 );
+            this.p.setY( 10 );
 
         this.move_option();
 }
@@ -74,7 +74,7 @@ Animal.prototype.findCondition = function( liv ) {
     var rel_position = this.p.clone().subtract( liv.getPosition() );
     var rel_head = this.calculateHead().subtract( this.p );
     var rel_angle = rel_position.getAngle() - rel_head.getAngle();
-    if( rel_position.getLength() < this.sightLength && this.sightAngle < rel_angle && rel_angle < this.sightAngle + this.sightWidth ) return true;
+    if( ( rel_position.getLength() < this.sightLength && this.sightAngle < rel_angle && rel_angle < this.sightAngle + this.sightWidth ) || (rel_position.getLength() < this.size * 2 ) ) return true;
     else return false;
 }
 
@@ -93,6 +93,9 @@ Animal.prototype.getAllInSight = function( liv_ary ) {
 }
 
 Animal.prototype.eat = function( liv_ary ) {
+    if ( liv_ary.length == 0 )
+        return;
+
     var index = this.binarySearch( liv_ary, 0, liv_ary.length - 1 );
     if ( index ) {
         liv_ary.splice( index, 1 );

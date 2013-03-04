@@ -89,6 +89,15 @@ Carnivore.prototype.move_option = function() {
     else if ( Math.random() < 0.01 )
         this.v.randomRotate();
 
+    if ( this.state.isPuberty() ) {
+        var herb = world.getHerbivore();
+        var target = this.findClosest( herb );
+        if ( target ) {
+            var result = target.getPosition().clone().subtract( this.p ).setLength( this.size );
+            this.v = new Velocity( result.getX(), result.getY() );
+        }
+    }
+
     if ( this.state.isAdult() && Math.random() < 0.5 ) {
         var herb = world.getHerbivore();
         this.changeVelocityToClosest( herb );
@@ -141,12 +150,12 @@ Carnivore.prototype.grow_if = function() {
     if( this.age < this.end_of_child ) {
         this.state.setState("child");
         this.size = 5;
-        this.v.normalize().extend( 3 );
+        this.v.normalize().extend( 4 );
     }
     else if ( this.state.isChild() && 100 < this.energy && this.end_of_child < this.age ) {
         this.state.grow();
         this.size = 5;
-        this.v.normalize().extend( 4 );
+        this.v.normalize().extend( 7 );
         this.energy -= 50;
     }
     else if ( this.state.isPuberty() && 600 < this.energy && this.end_of_puberty < this.age ) {
