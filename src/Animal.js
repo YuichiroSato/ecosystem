@@ -14,7 +14,9 @@ var Animal = function( p, v, energy ) {
     this.energy = energy;
     this.size = 5;
     this.age = 0;
-    this.sight = 10;
+    this.sightLength = 10;
+    this.sightAngle = Math.PI / 4;
+    this.sightWidth = Math.PI / 2;
     this.state = new State();
 
     this.graphics;
@@ -51,7 +53,7 @@ Animal.prototype.move = function() {
 
 Animal.prototype.findClosest = function( liv_ary ) {
 
-    var options = this.findTargets( liv_ary, this.findCondition );
+    var options = this.inSight( liv_ary, this.findCondition );
 
     if ( 0 < options.length ) {
 
@@ -72,11 +74,11 @@ Animal.prototype.findCondition = function( liv ) {
     var rel_position = this.p.clone().subtract( liv.getPosition() );
     var rel_head = this.calculateHead().subtract( this.p );
     var rel_angle = rel_position.getAngle() - rel_head.getAngle();
-    if( rel_position.getLength() < this.sightLength && this.sightAngle < rel_angle && rel_angle < this.sightAngle + Math.PI / 2 && !liv.getState().isChild() ) return true;
+    if( rel_position.getLength() < this.sightLength && this.sightAngle < rel_angle && rel_angle < this.sightAngle + this.sightWidth ) return true;
     else return false;
 }
 
-Animal.prototype.findTargets = function( liv_ary, cond ) {
+Animal.prototype.inSight = function( liv_ary, cond ) {
     var targets = new Array();
     for (var i = 0; i < liv_ary.length; i++) {
         if( cond.call( this, liv_ary[i] ) )
