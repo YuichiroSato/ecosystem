@@ -49,37 +49,10 @@ Animal.prototype.move = function() {
         this.move_option();
 }
 
-Animal.prototype.findClosest = function( liv_ary ) {
-
-    var options = this.findTargets( liv_ary, this.findCondition );
-
-    if ( 0 < options.length ) {
-
-        var closer = function( liv1, liv2 ) {
-            if( liv1.getPosition().distanceBetween( this.p ) < liv2.getPosition().distanceBetween( this.p ) )
-                return liv1;
-            else return liv2; 
-        }
-
-        var closest_liv = options[0];
-        for(var i = 0; i < options.length; i++)
-            closest_liv = closer.call( this, closest_liv, options[i] );
-        return closest_liv;
-    }
-}
-
-Animal.prototype.findCondition = function( liv ) {
-    var rel_position = this.p.clone().subtract( liv.getPosition() );
-    var rel_head = this.calculateHead().subtract( this.p );
-    var rel_angle = rel_position.getAngle() - rel_head.getAngle();
-    if( rel_position.getLength() < this.sightLength && this.sightAngle < rel_angle && rel_angle < this.sightAngle + Math.PI / 2 && !liv.getState().isChild() ) return true;
-    else return false;
-}
-
 Animal.prototype.findTargets = function( liv_ary, cond ) {
     var targets = new Array();
     for (var i = 0; i < liv_ary.length; i++) {
-        if( cond.call( this, liv_ary[i] ) )
+        if( cond( liv_ary[i] ) )
             targets[targets.length] = liv_ary[i];
     }
     return targets;
