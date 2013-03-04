@@ -123,7 +123,9 @@ var World = function ( num_plant, num_herbivore, num_carnivore ) {
         return ary;
     }
 
+    this.getPlant = function() { return p; }
     this.getHerbivore = function() { return h; }
+    this.getCarnivore = function() { return c; }
     this.getPlantPopulation = function() { return p.length; }
     this.getHerbivorePopulation = function() { return h.length; }
     this.getCarnivorePopulation = function() { return c.length; }

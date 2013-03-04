@@ -85,6 +85,14 @@ Animal.prototype.findTargets = function( liv_ary, cond ) {
     return targets;
 }
 
+Animal.prototype.inSight = function( liv ) {
+    var rel_position = this.p.clone().subtract( liv.getPosition() );
+    var rel_head = this.calculateHead().subtract( this.p );
+    var rel_angle = rel_position.getAngle() - rel_head.getAngle();
+    if( rel_position.getLength() < this.sightLength && this.sightAngle < rel_angle && rel_angle < this.sightAngle + Math.PI / 2 && !liv.getState().isChild() ) return true;
+    else return false; 
+}
+
 Animal.prototype.eat = function( liv_ary ) {
     var index = this.binarySearch( liv_ary, 0, liv_ary.length - 1 );
     if ( index ) {

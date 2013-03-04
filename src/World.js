@@ -22,15 +22,13 @@ var World = function ( num_plant, num_herbivore, num_carnivore ) {
         return new Carnivore( new Position( Math.random()*300, Math.random()*300), 100);
     };
 
-    for (var i = 0; i < num_plant; i++) {
+    for (var i = 0; i < num_plant; i++)
         p[i] = pconst();
-    }
-    for (var i = 0; i < num_herbivore; i++) {
+    for (var i = 0; i < num_herbivore; i++)
         h[i] = hconst();
-    }
-    for (var i = 0; i < num_carnivore; i++) {
+    for (var i = 0; i < num_carnivore; i++)
         c[i] = cconst();
-    }
+
 
     this.evolve = function() {
         this.moveAll();
@@ -41,12 +39,10 @@ var World = function ( num_plant, num_herbivore, num_carnivore ) {
     }
 
     this.moveAll = function() {
-        for (var i = 0; i < h.length; i++) {
+        for (var i = 0; i < h.length; i++)
             h[i].move();
-        }
-        for (var i = 0; i < c.length; i++) {
+        for (var i = 0; i < c.length; i++)
             c[i].move();
-        }
     }
 
     this.eatAll = function() {
@@ -57,21 +53,17 @@ var World = function ( num_plant, num_herbivore, num_carnivore ) {
         };
         p.sort( alg );
         h.sort( alg );
-        for (var i = 0; i < h.length; i++) {
+        for (var i = 0; i < h.length; i++)
             p = h[i].eat( p );
-        }
-        for (var i = 0; i < c.length; i++) {
+        for (var i = 0; i < c.length; i++)
             h = c[i].eat( h );
-        }
     }
 
     this.growAll = function() {
-        for (var i = 0; i < h.length; i++) {
+        for (var i = 0; i < h.length; i++)
             h[i].grow();
-        }
-        for (var i = 0; i < c.length; i++) {
+        for (var i = 0; i < c.length; i++)
             c[i].grow();
-        }
     }
 
     this.birthAll = function() {
@@ -92,34 +84,28 @@ var World = function ( num_plant, num_herbivore, num_carnivore ) {
     }
 
     this.dieAll = function() {
-        for (var i = h.length - 1; -1 < i; i--) {
+        for (var i = h.length - 1; -1 < i; i--)
             if( h[i].die() ) h.splice( i, 1 );
-        }
-        for (var i = c.length - 1; -1 < i; i--) {
+        for (var i = c.length - 1; -1 < i; i--)
             if( c[i].die() ) c.splice( i, 1 );
-        }
     }
 
     this.draw = function() {
         ctx.fillStyle = "rgb(255,255,255)";
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
-        for (var i = 0; i < p.length; i++) {
+        for (var i = 0; i < p.length; i++)
             p[i].draw();
-        }
-        for (var i = 0; i < h.length; i++) {
+        for (var i = 0; i < h.length; i++)
             h[i].draw();
-        }
-        for (var i = 0; i < c.length; i++) {
+        for (var i = 0; i < c.length; i++)
             c[i].draw();
-        }
     }
 
     this.initArray = function( size, constractor ) {
         var ary = new Array( size );
-        for (var i = 0; i < size; i++) {
+        for (var i = 0; i < size; i++)
             ary[i] = constractor();
-        }
         return ary;
     }
 
