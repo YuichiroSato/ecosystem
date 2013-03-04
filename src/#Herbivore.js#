@@ -15,8 +15,11 @@ var Herbivore = function( p, en ) {
     this.size = 8;
     this.energy = en;
     this.sightLength = 100;
-    this.sightAngle = Math.PI;
+    this.sightAngle = -Math.PI / 4;
+    this.sightWidth = 3 * Math.PI / 4;
     this.state = new State();
+
+    this.enemy = null;
 
     this.end_of_child = 60;
     this.end_of_puberty = 100;
@@ -53,6 +56,7 @@ Herbivore.prototype.move_option = function() {
         this.v.randomRotate();
     }
 
+    if ( !enemy )
     var carn = world.getCarnivore();
     var enemy = this.findClosest( carn );
     if ( enemy ) {

@@ -15,7 +15,8 @@ var Herbivore = function( p, en ) {
     this.size = 8;
     this.energy = en;
     this.sightLength = 100;
-    this.sightAngle = Math.PI;
+    this.sightAngle = -Math.PI / 4;
+    this.sightWidth = 3 * Math.PI / 4;
     this.state = new State();
 
     this.end_of_child = 60;

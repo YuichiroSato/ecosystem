@@ -53,7 +53,7 @@ Animal.prototype.move = function() {
 
 Animal.prototype.findClosest = function( liv_ary ) {
 
-    var options = this.inSight( liv_ary, this.findCondition );
+    var options = this.getAllInSight( liv_ary );
 
     if ( 0 < options.length ) {
 
@@ -78,10 +78,15 @@ Animal.prototype.findCondition = function( liv ) {
     else return false;
 }
 
-Animal.prototype.inSight = function( liv_ary, cond ) {
+Animal.prototype.inSight = function( liv ) {
+    if ( this.findCondition( liv ) ) return true;
+    else return false; 
+}
+
+Animal.prototype.getAllInSight = function( liv_ary ) {
     var targets = new Array();
     for (var i = 0; i < liv_ary.length; i++) {
-        if( cond.call( this, liv_ary[i] ) )
+        if ( this.inSight( liv_ary[i] ) )
             targets[targets.length] = liv_ary[i];
     }
     return targets;
