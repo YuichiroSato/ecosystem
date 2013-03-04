@@ -14,10 +14,12 @@ var Herbivore = function( p, en ) {
     this.v.randomRotate();
     this.size = 8;
     this.energy = en;
-    this.sightLength = 100;
+    this.sightLength = 50;
     this.sightAngle = -Math.PI / 4;
     this.sightWidth = 3 * Math.PI / 4;
     this.state = new State();
+
+    this.enemy = null;
 
     this.end_of_child = 60;
     this.end_of_puberty = 100;
@@ -54,10 +56,13 @@ Herbivore.prototype.move_option = function() {
         this.v.randomRotate();
     }
 
-    var carn = world.getCarnivore();
-    var enemy = this.findClosest( carn );
-    if ( enemy ) {
-        var result = enemy.getPosition().clone().subtract( this.p ).setLength( this.size ).rotate( 180 );
+    if ( !this.enemy )
+        this.enemy = this.findClosest( world.getCarnivore() );
+    else if ( !this.inSight( this.enemy ) )
+        this.enemy = null;
+
+    if ( this.enemy ) {
+        var result = this.enemy.getPosition().clone().subtract( this.p ).setLength( this.size ).rotate( 180 );
         this.v = new Velocity( result.getX(), result.getY() );
     }
     else {
