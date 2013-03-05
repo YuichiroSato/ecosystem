@@ -30,7 +30,7 @@ var Carnivore = function( p, en ) {
     this.end_of_child = 2;
     this.end_of_puberty = 10;
     this.end_of_adult = 300;
-    this.changable_span = 0.13;
+    this.changable_span = 1.0;
 }
 
 Carnivore.prototype = new Animal();
@@ -96,25 +96,26 @@ Carnivore.prototype.move_option = function() {
     else if ( Math.random() < 0.01 )
         this.v.randomRotate();
 
-/*    if ( this.state.isPuberty() ) {
-        var herb = world.getHerbivore();
-        var target = this.findClosest( herb );
-        if ( target ) {
-            var result = target.getPosition().clone().subtract( this.p ).setLength( this.size );
-            this.v = new Velocity( result.getX(), result.getY() );
-        }
-    }
-*/
-    if ( this.changable_span < this.v_counter ) {
-        if ( this.state.isPuberty() || this.state.isAdult() ) {
-            this.changeVelocityToClosest( world.getHerbivore() );
+    if ( this.target && Math.random() < 0.01 )
+        this.target = null;
+
+    if ( !this.target ) {
+        if ( ( this.state.isPuberty() || this.state.isAdult() ) && this.changable_span < this.v_counter) {
+            this.target = this.findClosest( world.getHerbivore() );
+            this.changeVelocityTo( this.target );
             this.v_counter = 0;
         }
     }
+    else if ( this.inSight( this.target ) && !this.target.die() )
+        this.changeVelocityTo( this.target );
+    else {
+        this.target = null;
+        this.v_counter = 0;
+    }
 }
 
-Carnivore.prototype.changeVelocityToClosest = function( herb ) {
-    var target = this.findClosest( herb );
+Carnivore.prototype.changeVelocityTo = function( target ) {
+    //var target = this.findClosest( herb );
     if ( target ) {
         var result = target.getPosition().clone().subtract( this.p ).setLength( this.size );
         this.v = new Velocity( result.getX(), result.getY() );

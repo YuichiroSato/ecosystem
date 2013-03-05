@@ -14,13 +14,19 @@ var Herbivore = function( p, en ) {
     this.v.randomRotate();
     this.size = 8;
     this.energy = en;
-    this.sightLength = 100;
-    this.sightAngle = Math.PI;
+    this.sightLength = 50;
+    this.sightAngle = -Math.PI / 4;
+    this.sightWidth = 3 * Math.PI / 4;
     this.state = new State();
 
-    this.end_of_child = 60;
-    this.end_of_puberty = 100;
-    this.end_of_adult = 1000;
+    this.enemy = null;
+    this.v_counter = 0;
+
+    this.dt = 0.04;
+    this.end_of_child = 2;
+    this.end_of_puberty = 4;
+    this.end_of_adult = 50;
+    this.changable_span = 2;
 }
 
 Herbivore.prototype = new Animal();
@@ -47,24 +53,34 @@ Herbivore.prototype.graphics = function( head ) {
 
 Herbivore.prototype.move_option = function() {
     this.energy -= 0.1;
+    this.v_counter += this.dt;
+
     if ( this.state.isAdult() ) 
         this.energy -= 0.3;
     if ( Math.random() < 0.1 ) {
         this.v.randomRotate();
     }
 
-    var carn = world.getCarnivore();
-    var enemy = this.findClosest( carn );
-    if ( enemy ) {
-        var result = enemy.getPosition().clone().subtract( this.p ).setLength( this.size ).rotate( 180 );
+    if ( this.changable_span < this.v_counter ) {
+        if ( !this.enemy ) {
+            this.enemy = this.findClosest( world.getCarnivore() );
+            this.v_counter = 0;
+        }
+        else if ( !this.inSight( this.enemy ) )
+            this.enemy = null;
+    }
+
+    if ( this.enemy ) {
+        var result = this.enemy.getPosition().clone().subtract( this.p ).setLength( this.size ).rotate( 180 );
         this.v = new Velocity( result.getX(), result.getY() );
     }
-    else {
+    else if ( this.changable_span < this.v_counter ) {
         var plnt = world.getPlant();
         var target = this.findClosest( plnt );
         if ( target ) {
-        var result = target.getPosition().clone().subtract( this.p ).setLength( this.size );
-        this.v = new Velocity( result.getX(), result.getY() );
+            var result = target.getPosition().clone().subtract( this.p ).setLength( this.size );
+            this.v = new Velocity( result.getX(), result.getY() );
+            this.v_counter = 0;
         }
     }
 }
@@ -96,11 +112,11 @@ Herbivore.prototype.grow_if = function() {
         this.v.normalize().extend( 2 );
     }
 
-    this.age++;
+    this.age += this.dt;
 }
 
 Herbivore.prototype.birth_if = function() {
-    if ( 70 <= this.energy && 200 < this.age) {
+    if ( 70 <= this.energy && this.age < this.end_of_adult ) {
         this.energy -= 30;
         return new Herbivore( this.p.clone(), 50 );
     }

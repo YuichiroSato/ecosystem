@@ -74,6 +74,9 @@ Herbivore.prototype.move_option = function() {
         var result = this.enemy.getPosition().clone().subtract( this.p ).setLength( this.size ).rotate( 180 );
         this.v = new Velocity( result.getX(), result.getY() );
     }
+    else if ( this.state.isChild ) {
+	;//    this.v.changeVelocityTo( this.findClosest( world.getHerbivore() ) );
+    }
     else if ( this.changable_span < this.v_counter ) {
         var plnt = world.getPlant();
         var target = this.findClosest( plnt );

@@ -39,13 +39,13 @@ Animal.prototype.calculateHead = function() {
 Animal.prototype.move = function() {
         this.p.add( this.v );
 
-        if( this.p.getX() < 0 )
+        if( this.p.getX() < -10 )
            this.p.setX( canvas.width - 10 );
-        else if( canvas.width < this.p.getX() )
+        else if( canvas.width + 10 < this.p.getX() )
            this.p.setX( 0 );
-        if( this.p.getY() < 0)
-            this.p.setY( canvas.width );  // to fix ecosystem field as square
-        else if( canvas.width < this.p.getY() )
+        if( this.p.getY() < -10)
+            this.p.setY( canvas.width -10 );  // to fix ecosystem field as square
+        else if( canvas.width + 10 < this.p.getY() )
             this.p.setY( 10 );
 
         this.move_option();
@@ -70,19 +70,19 @@ Animal.prototype.findClosest = function( liv_ary ) {
     }
 }
 
-Animal.prototype.findCondition = function( liv ) {
+Animal.prototype.inSight = function( liv ) {
     var rel_position = this.p.clone().subtract( liv.getPosition() );
     var rel_head = this.calculateHead().subtract( this.p );
     var rel_angle = rel_position.getAngle() - rel_head.getAngle();
     if( ( rel_position.getLength() < this.sightLength && this.sightAngle < rel_angle && rel_angle < this.sightAngle + this.sightWidth ) || (rel_position.getLength() < this.size * 2 ) ) return true;
     else return false;
 }
-
+/*
 Animal.prototype.inSight = function( liv ) {
     if ( this.findCondition( liv ) ) return true;
     else return false; 
 }
-
+*/
 Animal.prototype.getAllInSight = function( liv_ary ) {
     var targets = new Array();
     for (var i = 0; i < liv_ary.length; i++) {
