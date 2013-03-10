@@ -8,6 +8,7 @@
 <script type="text/javascript" src="../src/State.js"></script>
 
 <script type="text/javascript" src="../src/LivingThing.js"></script>
+<script type="text/javascript" src="../src/Plant.js"></script>
 <script type="text/javascript" src="../src/Animal.js"></script>
 <script type="text/javascript" src="../src/Carnivore.js"></script>
 <script type="text/javascript" src="../src/Herbivore.js"></script>
@@ -30,26 +31,31 @@ function init() {
     if ( ! canvas || ! canvas.getContext ) { return false; }
     ctx = canvas.getContext( '2d' );
 
-    world = new World(0,0,0);
-    car = new Carnivore( new Position( 100, 50 ), 100 );
-    car.setVelocity( new Velocity(-5,0) );
-    target = new Herbivore( new Position ( 150, 50 ), 100 );
-    target2 = new Herbivore( new Position ( 50, 50 ), 100 );
+    world = new World(50,30,0);
+    car = new Carnivore( new Position( 200, 200 ), 100 );
+    car.setVelocity( new Velocity(5,0) );
+    s = new State();
+    s.setState( "adult" );
+    car.setState( s );
+//    target = new Herbivore( new Position ( 150, 50 ), 100 );
+//    target2 = new Herbivore( new Position ( 50, 50 ), 100 );
 }
 
 function main() {
     ctx.fillStyle = "rgb(255,255,255)";
     ctx.fillRect(0,0,canvas.width,canvas.height);
  
+    world.evolve();
     car.move_option();
-    target.move();
-    target2.move();
+ //   target.move();
+//    target2.move();
 
+    world.draw();
     car.draw();
     car.drawLineToTarget();
     car.drawSight();
-    target.draw();
-    target2.draw();
+//    target.draw();
+//    target2.draw();
 
     car.changeVelocityTo( target );
 }

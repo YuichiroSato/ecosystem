@@ -82,7 +82,7 @@ Carnivore.prototype.graphics = function( head ) {
 
 Carnivore.prototype.move_option = function() {
     this.v_counter += this.dt;
-
+/*
     if( this.state.isChild() )
         this.energy -= 0.2;
     else if ( this.state.isAdult() )
@@ -98,7 +98,7 @@ Carnivore.prototype.move_option = function() {
 
     if ( this.target && Math.random() < 0.1 )
         this.target = null;
-
+	*/
     if ( !this.target || this.target.die() ) {
         if ( ( this.state.isPuberty() || this.state.isAdult() ) && this.changable_span < this.v_counter) {
             this.target = this.findClosest( world.getHerbivore() );
@@ -128,12 +128,14 @@ Carnivore.prototype.drawSight = function() {
     ctx.moveTo( this.p.getX(), this.p.getY() );
     var head = this.calculateHead();
     head.setDistance( this.p, this.sightLength );
-    ctx.lineTo( head.getX(), head.getY() );
+    head.rotateAround( this.p, this.sightWidth / (-2) );
+    ctx.arc( this.p.getX(), this.p.getY(), this.sightLength, head.getAngleAround( this.p ), head.getAngleAround( this.p ) + this.sightWidth, false);
+    ctx.closePath();
     ctx.stroke();
 }
 
 Carnivore.prototype.drawLineToTarget = function() {
-    if ( this.target ) {document.write("hoge");
+    if ( this.target ) {
         ctx.beginPath();
         ctx.strokeStyle = "rgb(255,64,64)";
         ctx.moveTo( this.p.getX(), this.p.getY() );

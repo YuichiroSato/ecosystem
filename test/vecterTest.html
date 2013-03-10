@@ -1,6 +1,6 @@
 <html>
 <head>
-<script type="text/javascript" src="../bin/Vector.js"></script>
+<script type="text/javascript" src="../src/Vector.js"></script>
 <script type="text/javascript" >
 function main() {document.write("hoge");
   var v = new Vector( 4, 4 );
@@ -59,6 +59,15 @@ function main() {document.write("hoge");
   document.write("equals test");ln();
   document.write(q.equals(t));ln();
   document.write(v.equals(t));ln();
+
+  document.write("angle test");
+  v.setVector( 5, 5 );
+  v.print();ln();
+  document.write("angle "+v.getAngle()+" vartical angle "+v.getVarticalAngle()+" (PI/4) "+Math.PI/4);
+  ln();
+  q.setVector( Math.sqrt(3), -1);
+  q.print();ln();
+  document.write("angle "+q.getAngle()+" vartical angle "+q.getVarticalAngle());
 }
 
 function ln() { document.write("<br>"); }

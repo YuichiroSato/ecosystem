@@ -68,6 +68,10 @@ Vector.prototype = {
         this.add( v );
     },
 
+    setDistance : function( v, c ) {
+        this.subtract( v ).setLength( c ).add( v );
+    },
+
     distanceBetween : function( v ) {
         return Math.sqrt( ( v.getX() - this.x ) * ( v.getX() - this.x ) + ( v.getY() - this.y ) * ( v.getY() - this.y ) );
     },

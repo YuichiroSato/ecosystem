@@ -33,7 +33,7 @@ Animal.prototype.draw = function() {
 }
 
 Animal.prototype.calculateHead = function() {
-    return this.p.clone().add( this.v.clone().normalize().extend( this.size ) );
+    return this.p.clone().add( this.v.clone().setLength( this.size ) );
 }
 
 Animal.prototype.move = function() {
@@ -77,12 +77,7 @@ Animal.prototype.inSight = function( liv ) {
     if( ( rel_position.getLength() < this.sightLength && this.sightAngle < rel_angle && rel_angle < this.sightAngle + this.sightWidth ) || (rel_position.getLength() < this.size * 2 ) ) return true;
     else return false;
 }
-/*
-Animal.prototype.inSight = function( liv ) {
-    if ( this.findCondition( liv ) ) return true;
-    else return false; 
-}
-*/
+
 Animal.prototype.getAllInSight = function( liv_ary ) {
     var targets = new Array();
     for (var i = 0; i < liv_ary.length; i++) {

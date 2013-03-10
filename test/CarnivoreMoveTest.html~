@@ -12,10 +12,13 @@
 <script type="text/javascript" src="../src/Carnivore.js"></script>
 <script type="text/javascript" src="../src/Herbivore.js"></script>
 
+<script type="text/javascript" src="../src/World.js"></script>
+
 <script type="text/javascript" >
 
 var canvas;
 var ctx;
+var world;
 var car;
 var target;
 var target2;
@@ -27,6 +30,7 @@ function init() {
     if ( ! canvas || ! canvas.getContext ) { return false; }
     ctx = canvas.getContext( '2d' );
 
+    world = new World(0,0,0);
     car = new Carnivore( new Position( 100, 50 ), 100 );
     car.setVelocity( new Velocity(-5,0) );
     target = new Herbivore( new Position ( 150, 50 ), 100 );
@@ -37,10 +41,13 @@ function main() {
     ctx.fillStyle = "rgb(255,255,255)";
     ctx.fillRect(0,0,canvas.width,canvas.height);
  
-    car.move();
+    car.move_option();
     target.move();
+    target2.move();
 
     car.draw();
+    car.drawLineToTarget();
+    car.drawSight();
     target.draw();
     target2.draw();
 

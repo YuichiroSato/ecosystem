@@ -1,6 +1,6 @@
 <html>
 <head>
-<script type="text/javascript" src="bin/Vector.js"></script>
+<script type="text/javascript" src="../bin/Vector.js"></script>
 <script type="text/javascript" >
 function main() {document.write("hoge");
   var v = new Vector( 4, 4 );
