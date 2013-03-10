@@ -91,6 +91,11 @@ Vector.prototype = {
     setVector : function( x, y ) { this.x = x; this.y = y; },
     setX : function( x ) { this.x = x; },
     setY : function( y ) { this.y = y; },
+    setLength : function ( c ) {
+        this.normalize();
+        this.extend( c );
+        return this;
+    },
     getX : function() { return this.x; },
     getY : function() { return this.y; },
     getLength : function() { return Math.sqrt( this.x * this.x + this.y * this.y ); },

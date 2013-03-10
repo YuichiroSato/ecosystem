@@ -96,14 +96,17 @@ Carnivore.prototype.move_option = function() {
     else if ( Math.random() < 0.01 )
         this.v.randomRotate();
 
-    if ( !this.target ) {
+    if ( this.target && Math.random() < 0.1 )
+        this.target = null;
+
+    if ( !this.target || this.target.die() ) {
         if ( ( this.state.isPuberty() || this.state.isAdult() ) && this.changable_span < this.v_counter) {
             this.target = this.findClosest( world.getHerbivore() );
             this.changeVelocityTo( this.target );
             this.v_counter = 0;
         }
     }
-    else if ( this.inSight( this.target ) )
+    else if ( this.inSight( this.target ) && !this.target.die() )
         this.changeVelocityTo( this.target );
     else {
         this.target = null;

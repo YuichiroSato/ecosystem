@@ -96,10 +96,10 @@ Carnivore.prototype.move_option = function() {
     else if ( Math.random() < 0.01 )
         this.v.randomRotate();
 
-    if ( this.target && Math.random() < 0.01 )
+    if ( this.target && Math.random() < 0.1 )
         this.target = null;
 
-    if ( !this.target ) {
+    if ( !this.target || this.target.die() ) {
         if ( ( this.state.isPuberty() || this.state.isAdult() ) && this.changable_span < this.v_counter) {
             this.target = this.findClosest( world.getHerbivore() );
             this.changeVelocityTo( this.target );
@@ -121,23 +121,31 @@ Carnivore.prototype.changeVelocityTo = function( target ) {
         this.v = new Velocity( result.getX(), result.getY() );
     }
 }
-/*
-Carnivore.prototype.funclojure = function() {
-    var pos = this.p;
-    var head = this.calculateHead();
-    var rel_head = head.subtract( pos );
-    var len = this.sightLength;
-    var angle = this.sightAngle;
 
-    return function( liv ) {
-	//pos.print();head.print();rel_head.print();document.write(" "+len+" "+angle);
-        var rel_position = pos.clone().subtract( liv.getPosition() );
-        var rel_angle = rel_position.getAngle() - rel_head.getAngle();
-        if( rel_position.getLength() < len && angle < rel_angle && rel_angle < angle + Math.PI / 2 && !liv.getState().isChild() ) return true;
-         else return false;
+Carnivore.prototype.drawSight = function() {
+    ctx.beginPath();
+    ctx.strokeStyle = "rgb(0,0,0)";
+    ctx.moveTo( this.p.getX(), this.p.getY() );
+    var head = this.calculateHead();
+    head.setDistance( this.p, this.sightLength );
+    ctx.lineTo( head.getX(), head.getY() );
+    ctx.stroke();
+}
+
+Carnivore.prototype.drawLineToTarget = function() {
+    if ( this.target ) {document.write("hoge");
+        ctx.beginPath();
+        ctx.strokeStyle = "rgb(255,64,64)";
+        ctx.moveTo( this.p.getX(), this.p.getY() );
+        ctx.lineTo( this.target.getPosition().getX(), this.target.getPosition().getY() );
+        ctx.stroke();
+    }
+    else {
+        ctx.fillStyle = "rgb(0,0,0)";
+        ctx.fillRect( this.p.getX(), this.p.getY(), 3, 3 );
     }
 }
-*/
+
 Carnivore.prototype.eat_option = function() {
     this.energy += 100;
 }
