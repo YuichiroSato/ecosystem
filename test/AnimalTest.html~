@@ -1,11 +1,11 @@
 <html>
 <head>
 
-<script type="text/javascript" src="bin/Vector.js"></script>
-<script type="text/javascript" src="bin/Position.js"></script>
+<script type="text/javascript" src="../bin/Vector.js"></script>
+<script type="text/javascript" src="../bin/Position.js"></script>
 
-<script type="text/javascript" src="bin/LivingThing.js"></script>
-<script type="text/javascript" src="bin/Animal.js"></script>
+<script type="text/javascript" src="../bin/LivingThing.js"></script>
+<script type="text/javascript" src="../bin/Animal.js"></script>
 
 <script type="text/javascript" >
 function main() {
@@ -38,6 +38,14 @@ function main() {
     prln( index );
     target.eat( inp_liv );
 
+    prln("find terget test");
+    var tesf = function( liv ) {
+        if( liv.getX() < 3 ) return true;
+        else return false;
+    };
+    prln( tesf );
+    var res = target.findTargets( inp_liv, tesf );
+    printAll( res );
 }
 
 function comp(a,b) { 

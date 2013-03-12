@@ -1,16 +1,19 @@
 <html>
 <head>
 
-<script type="text/javascript" src="../bin/Vector.js"></script>
-<script type="text/javascript" src="../bin/Position.js"></script>
+<script type="text/javascript" src="../src/Vector.js"></script>
+<script type="text/javascript" src="../src/Position.js"></script>
+<script type="text/javascript" src="../src/Velocity.js"></script>
 
-<script type="text/javascript" src="../bin/LivingThing.js"></script>
-<script type="text/javascript" src="../bin/Animal.js"></script>
+<script type="text/javascript" src="../src/LivingThing.js"></script>
+<script type="text/javascript" src="../src/Animal.js"></script>
+
+<script type="text/javascript" src="../src/State.js"></script>
 
 <script type="text/javascript" >
 function main() {
     prln("no parse errer");
-    var ani = new Animal( new Position( 3, 4 ) );
+    var ani = new Animal( new Position( 3, 4 ), new Velocity( 5, 0 ), 100);
 
     prln("die test");
     prln("set energy 100");
@@ -19,6 +22,21 @@ function main() {
     prln("set energy 0 ");
     ani.setEnergy(0);
     prln(ani.die());
+
+    prln("in sight test");
+    var origin = new Animal( new Position( 50, 50 ), new Velocity( 5, 0 ), 100);
+    origin.print();ln();
+    origin.sightLength = 100;
+    origin.sightWidth = Math.PI / 2;
+    prln("this sight angle "+origin.sightWidth+" velocity "+origin.getVelocity().toString());
+    var isintest1 = new Animal( new Position( 60, 50 ), new Velocity( 5, 0 ), 100);
+    var isintest2 = new Animal( new Position( 60, 60 ), new Velocity( 5, 0 ), 100);
+    var behind = new Animal ( new Position( 45, 45 ), new Velocity( 5, 0 ), 100);
+    prln("head angle "+convDig(origin.calculateHead().getAngleAround( origin.p )));
+    prln("angle "+convDig(isintest1.getPosition().getAngleAround( origin.p ))+" "+convDig(isintest2.getPosition().getAngleAround( origin.p )));
+    prln("in sight "+origin.inSight( isintest1 )+" in sigth angle "+origin.inSightAngle( isintest1.getPosition().getAngleAround( origin.p ) ) );
+    prln("in sight "+origin.inSight( isintest2 )+" in sigth angle "+origin.inSightAngle( isintest2.getPosition().getAngleAround( origin.p ) ) );
+    prln("in sight "+origin.inSight( behind )+" in sigth angle "+origin.inSightAngle( behind.getPosition().getAngleAround( origin.p ) ) );
 
     ln();
     var inp_liv = makeTestData();
@@ -29,13 +47,14 @@ function main() {
     prln("after soted");
     printAll( inp_liv );
     ln();
-    var target = new Animal( new Position( 1, 2, 100 ) );
+    var target = new Animal( new Position( 1, 2, 100 ), new Velocity(3,0), 50 );
     target.setSize( 2 );
     prln("search target");
     target.print();
     ln();
     var index = target.binarySearch( inp_liv, 0, inp_liv.length - 1 );
     prln( index );
+    target.eat_option = function() {;};
     target.eat( inp_liv );
 
     prln("find terget test");
@@ -44,9 +63,11 @@ function main() {
         else return false;
     };
     prln( tesf );
-    var res = target.findTargets( inp_liv, tesf );
+    var res = target.getAllInSight( inp_liv, tesf );
     printAll( res );
 }
+
+function convDig( rag ) { return rag * 360 / (2*Math.PI); }
 
 function comp(a,b) { 
     if (a.getX() < b.getX()) return -1;

@@ -71,10 +71,18 @@ Animal.prototype.findClosest = function( liv_ary ) {
 }
 
 Animal.prototype.inSight = function( liv ) {
-    var rel_position = this.p.clone().subtract( liv.getPosition() );
-    var rel_head = this.calculateHead().subtract( this.p );
-    var rel_angle = rel_position.getAngle() - rel_head.getAngle();
-    if( ( rel_position.getLength() < this.sightLength && this.sightAngle < rel_angle && rel_angle < this.sightAngle + this.sightWidth ) || (rel_position.getLength() < this.size * 2 ) ) return true;
+    if ( ( this.p.distanceBetween( liv.getPosition() ) < this.sightLength
+            && this.inSightAngle( liv.getPosition().getAngleAround( this.p ) ) )
+        || this.p.distanceBetween( liv.getPosition() ) < 2 * this.size )
+        return true;
+    else return false;
+}
+
+Animal.prototype.inSightAngle = function( angle ) {
+    var head = this.calculateHead();
+    var lowerbound = head.getAngleAround( this.p ) - this.sightWidth / 2;
+    var upperbound = head.getAngleAround( this.p ) + this.sightWidth / 2;
+    if ( lowerbound < angle && angle < upperbound ) return true;
     else return false;
 }
 

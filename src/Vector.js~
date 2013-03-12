@@ -104,6 +104,18 @@ Vector.prototype = {
     getY : function() { return this.y; },
     getLength : function() { return Math.sqrt( this.x * this.x + this.y * this.y ); },
     getAngle : function() { return Math.asin( this.x / this.getLength() ); },
+    getAngleAround : function( v ) {
+        this.subtract( v );
+        var ang = this.getAngle();
+        this.add( v );
+        return ang;
+    },
+    getVarticalAngle : function() {
+        this.rotate( Math.PI / 4 );
+        var ang = this.getAngle();
+        this.rotate( - Math.PI / 4 );
+        return ang;
+    },
 
     clone : function() {
         var f = function(){};

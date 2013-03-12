@@ -67,7 +67,13 @@ function main() {document.write("hoge");
   ln();
   q.setVector( Math.sqrt(3), -1);
   q.print();ln();
-  document.write("angle "+q.getAngle()+" vartical angle "+q.getVarticalAngle());
+  document.write("angle "+q.getAngle()+" (PI/3) "+Math.PI/3+" vartical angle "+q.getVarticalAngle()+" (PI/6) "+Math.PI/6);ln();
+
+  document.write("angle around test");ln();
+  q.add(v);
+  q.print();ln();
+  document.write("angle "+q.getAngleAround(v)+" (PI/3) "+Math.PI/3+" vartical angle "+q.getVarticalAngleAround(v)+" (PI/6) "+Math.PI/6);
+  
 }
 
 function ln() { document.write("<br>"); }

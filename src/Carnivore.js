@@ -128,8 +128,8 @@ Carnivore.prototype.drawSight = function() {
     ctx.moveTo( this.p.getX(), this.p.getY() );
     var head = this.calculateHead();
     head.setDistance( this.p, this.sightLength );
-    head.rotateAround( this.p, this.sightWidth / (-2) );
-    ctx.arc( this.p.getX(), this.p.getY(), this.sightLength, head.getAngleAround( this.p ), head.getAngleAround( this.p ) + this.sightWidth, false);
+    //head.rotateAround( this.p, this.sightWidth / (-2) );
+    ctx.arc( this.p.getX(), this.p.getY(), this.sightLength, head.getVarticalAngleAround( this.p ) - this.sightWidth / 2, head.getVarticalAngleAround( this.p ) + this.sightWidth / 2, false);
     ctx.closePath();
     ctx.stroke();
 }
