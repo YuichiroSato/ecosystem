@@ -63,19 +63,20 @@ function main() {document.write("hoge");
   document.write("angle test");
   v.setVector( 5, 5 );
   v.print();ln();
-  document.write("angle "+v.getAngle()+" vartical angle "+v.getVarticalAngle()+" (PI/4) "+Math.PI/4);
+  document.write("angle "+convD(v.getAngle())+" vartical angle "+convD(v.getVarticalAngle())+" (PI/4) "+convD(Math.PI/4));
   ln();
   q.setVector( Math.sqrt(3), -1);
   q.print();ln();
-  document.write("angle "+q.getAngle()+" (PI/3) "+Math.PI/3+" vartical angle "+q.getVarticalAngle()+" (PI/6) "+Math.PI/6);ln();
+  document.write("angle "+convD(q.getAngle())+" (PI/3) "+convD(Math.PI/3)+" vartical angle "+convD(q.getVarticalAngle())+" (PI/6) "+convD(Math.PI/6));ln();
 
   document.write("angle around test");ln();
   q.add(v);
   q.print();ln();
-  document.write("angle "+q.getAngleAround(v)+" (PI/3) "+Math.PI/3+" vartical angle "+q.getVarticalAngleAround(v)+" (PI/6) "+Math.PI/6);
+  document.write("angle "+convD(q.getAngleAround(v))+" (PI/3) "+convD(Math.PI/3)+" vartical angle "+convD(q.getVarticalAngleAround(v))+" (PI/6) "+convD(Math.PI/6));
   
 }
 
+function convD( rag ) { return rag * 360 / (2*Math.PI); }
 function ln() { document.write("<br>"); }
 </script>
 </head>

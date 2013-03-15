@@ -27,10 +27,10 @@ var Carnivore = function( p, en ) {
     this.color_changed = false;
 
     this.dt = 0.04
-    this.end_of_child = 2;
-    this.end_of_puberty = 10;
-    this.end_of_adult = 300;
-    this.changable_span = 1.0;
+    this.end_of_child = 20;
+    this.end_of_puberty = 40;
+    this.end_of_adult = 600;
+    this.changable_span = 0.5;
 }
 
 Carnivore.prototype = new Animal();
@@ -82,31 +82,31 @@ Carnivore.prototype.graphics = function( head ) {
 
 Carnivore.prototype.move_option = function() {
     this.v_counter += this.dt;
-/*
+
     if( this.state.isChild() )
         this.energy -= 0.2;
     else if ( this.state.isAdult() )
-        this.energy -= 1.5;
+        this.energy -= 12.0;
     else
-        this.energy -= 1.0;
+        this.energy -= 5.0;
 
     if ( !this.state.isAdult() && Math.random() < 0.1 ) {
-        this.v.randomRotate();
+        this.v.randomRotateWith( 90 );
     }
-    else if ( Math.random() < 0.01 )
-        this.v.randomRotate();
+    else if ( Math.random() < 0.1 )
+        this.v.randomRotateWith( 90 );
 
-    if ( this.target && Math.random() < 0.1 )
+    if ( this.target && !world.isExist( this.target ) )
         this.target = null;
-	*/
+
     if ( !this.target || this.target.die() ) {
-        if ( ( this.state.isPuberty() || this.state.isAdult() ) && this.changable_span < this.v_counter) {
+        if ( this.state.isPuberty() || this.state.isAdult() ) {
             this.target = this.findClosest( world.getHerbivore() );
             this.changeVelocityTo( this.target );
             this.v_counter = 0;
         }
     }
-    else if ( this.inSight( this.target ) && !this.target.die() )
+    else if ( this.inSight( this.target ) && this.target.die() == false )
         this.changeVelocityTo( this.target );
     else {
         this.target = null;
@@ -117,19 +117,19 @@ Carnivore.prototype.move_option = function() {
 Carnivore.prototype.changeVelocityTo = function( target ) {
     //var target = this.findClosest( herb );
     if ( target ) {
-        var result = target.getPosition().clone().subtract( this.p ).setLength( this.size );
+        var result = target.getPosition().clone().subtract( this.p ).setLength( this.v.getLength() );
         this.v = new Velocity( result.getX(), result.getY() );
     }
 }
 
+//bug
 Carnivore.prototype.drawSight = function() {
     ctx.beginPath();
     ctx.strokeStyle = "rgb(0,0,0)";
     ctx.moveTo( this.p.getX(), this.p.getY() );
     var head = this.calculateHead();
     head.setDistance( this.p, this.sightLength );
-    //head.rotateAround( this.p, this.sightWidth / (-2) );
-    ctx.arc( this.p.getX(), this.p.getY(), this.sightLength, head.getVarticalAngleAround( this.p ) - this.sightWidth / 2, head.getVarticalAngleAround( this.p ) + this.sightWidth / 2, false);
+    ctx.arc( this.p.getX(), this.p.getY(), this.sightLength, head.getAngleAround( this.p )/* - this.sightWidth / 2*/, head.getAngleAround( this.p )/* + this.sightWidth / 2*/, false);
     ctx.closePath();
     ctx.stroke();
 }
@@ -149,27 +149,28 @@ Carnivore.prototype.drawLineToTarget = function() {
 }
 
 Carnivore.prototype.eat_option = function() {
-    this.energy += 100;
+    this.energy += 200;
+    this.target = null;
 }
 
 Carnivore.prototype.grow_if = function() {
     if( this.age < this.end_of_child ) {
         this.state.setState("child");
         this.size = 5;
-        this.v.normalize().extend( 5 );
+        this.v.normalize().extend( 6 );
     }
     else if ( this.state.isChild() && 100 < this.energy && this.end_of_child < this.age ) {
         this.state.grow();
-        this.size = 5;
-        this.v.normalize().extend( 6 );
+        this.size = 7;
+        this.v.normalize().extend( 7 );
         this.energy -= 50;
     }
-    else if ( this.state.isPuberty() && 600 < this.energy && this.end_of_puberty < this.age ) {
+    else if ( this.state.isPuberty() && 2000 < this.energy && this.end_of_puberty < this.age ) {
         this.state.grow();
         this.size = 10;
-        this.v.normalize().extend( 13 );
-        this.energy -= 400;
-        this.age = this.end_of_adult - Math.random() * 7;
+        this.v.normalize().extend( 9 );
+        this.energy -= 800;
+        this.age = this.end_of_adult - Math.random() * 10;
     }
     else if ( !this.state.isOld() && this.end_of_adult < this.age ) {
         this.state.setState( "old" );
@@ -180,8 +181,8 @@ Carnivore.prototype.grow_if = function() {
 }
 
 Carnivore.prototype.birth_if = function() {
-    if ( this.state.isAdult() && 500 <= this.energy ) {
-        this.energy -= 350;
+    if ( this.state.isAdult() && 1450 <= this.energy ) {
+        this.energy -= 1250;
         return new Carnivore( this.p.clone(), 100 );
     }
 }

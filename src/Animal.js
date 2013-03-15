@@ -70,6 +70,29 @@ Animal.prototype.findClosest = function( liv_ary ) {
     }
 }
 
+Animal.prototype.findClosestNoMe = function( liv_ary ) {
+
+    var options = this.getAllInSight( liv_ary );
+
+    if ( 0 < options.length ) {
+
+        var closer = function( liv1, liv2 ) {
+            if( liv1.getPosition().distanceBetween( this.p ) < liv2.getPosition().distanceBetween( this.p ) )
+                return liv1;
+            else return liv2; 
+        }
+
+        var closest_liv = options[0];
+        for(var i = 0; i < options.length; i++) {
+            var tem = closer.call( this, closest_liv, options[i] );
+            if ( tem != this ) {
+                closest_liv = tem;
+            }
+        }
+        return closest_liv;
+    }
+}
+
 Animal.prototype.inSight = function( liv ) {
     if ( ( this.p.distanceBetween( liv.getPosition() ) < this.sightLength
             && this.inSightAngle( liv.getPosition().getAngleAround( this.p ) ) )

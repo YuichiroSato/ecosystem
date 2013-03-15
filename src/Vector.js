@@ -111,11 +111,11 @@ Vector.prototype = {
         return ang;
     },
     getVarticalAngle : function() {
-//        this.rotate( Math.PI / 4 );
-//        var ang = this.getAngle();
-//        this.rotate( - Math.PI / 4 );
-//        return ang;
-        return this.getAngle() - Math.PI / 2;
+        this.rotate( - Math.PI / 2 );
+        var ang = this.getAngle();
+        this.rotate( Math.PI / 2 );
+        return ang;
+//        return this.getAngle() - Math.PI / 2;
     },
     getVarticalAngleAround : function( v ) {
         this.subtract( v );

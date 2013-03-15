@@ -79,8 +79,8 @@ var World = function ( num_plant, num_herbivore, num_carnivore ) {
         //    var tem = p[i].birth();
         //    if (tem) p[p.length] = tem;
         //}
-        if ( Math.random() < 0.8 ) 
-            p[p.length] = new Plant( new Position( 20+Math.random()*360, 20+Math.random()*360 ) );
+        for (var i = 0; i < 2; i++)
+            if ( Math.random() < 0.8 ) p[p.length] = new Plant( new Position( 20+Math.random()*360, 20+Math.random()*360 ) );
         for (var i = 0; i < h.length; i++) {
             var tem = h[i].birth();
             if (tem) h[h.length] = tem;
@@ -129,4 +129,13 @@ var World = function ( num_plant, num_herbivore, num_carnivore ) {
     this.getPlantPopulation = function() { return p.length; }
     this.getHerbivorePopulation = function() { return h.length; }
     this.getCarnivorePopulation = function() { return c.length; }
+    this.isExist = function( liv ) {
+        for( var i = 0; i < p.length; i++)
+            if ( p[i] == liv ) return true;
+        for( var i = 0; i < h.length; i++)
+            if ( h[i] == liv ) return true;
+        for( var i = 0; i < c.length; i++)
+            if ( c[i] == liv ) return true;
+        return false;
+    }
 }
